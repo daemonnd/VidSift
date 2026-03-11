@@ -22,6 +22,16 @@ The goal of this project is to solve this problem. To see how exactly, check out
   - score from 40 to 0: do nothing
 - It writes the video url to already_processed.json
 
+## Features
+
+- Automated process of fetching, validating, taking action depending on validation
+- Runs in the background, no user intervention required
+
+## Dependencies
+
+- [fabric](https://github.com/danielmiessler/Fabric) for fetching the transcript and using the ai
+- yt-dlp for downloading the yt video
+
 ## Future improvements
 
 - make custom system prompt for fabric depending on the channel
