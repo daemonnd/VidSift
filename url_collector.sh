@@ -27,6 +27,10 @@ function main {
     while read -r name channelid; do
         echo "$name"
         echo "$channelid"
+        # extract all the urls from the xml
+        while read -r url; do
+            echo "url: $url"
+        done < <(curl "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid" | xmllint --xpath "//*[local-name() = 'link']/@href" - | awk -F '"' ' {print $2} ' | grep -oE 'http.*watch.*')
     done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
 }
 
