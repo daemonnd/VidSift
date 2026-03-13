@@ -25,13 +25,10 @@ function check_args {
 
 function main {
     while read -r url; do
-        if grep -q "$url" <./already_processed_urls.txt; then
-            echo "url $url found in already_processed_urls.txt"
-        else
-            echo "processing $url ..."
+        if ! grep -q "$url" <./already_processed_urls.txt; then
             echo "$url" >>./already_processed_urls.txt
         fi
-    done <./new_urls.txt
+    done </dev/stdin
 }
 
 # call main with all args, as given
