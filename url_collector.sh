@@ -23,7 +23,15 @@ function check_args {
     echo
 }
 
+function init {
+    if [[ ! -w ./already_processed_urls.txt ]]; then
+        touch ./already_processed_urls.txt
+    fi
+}
+
 function main {
+    init
+
     while read -r name channelid; do
         # extract all the urls from the xml
         while read -r url; do
