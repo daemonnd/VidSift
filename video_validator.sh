@@ -1,4 +1,8 @@
 #!/bin/bash
+# file for validating the video. That includes:
+# - fetching the transcript of the video
+# - running fabric with a custom pattern against the transcript and get the score
+# - return the action that should be performed
 
 # strict mode
 set -Eeuo pipefail
@@ -19,12 +23,29 @@ trap 'echo "Error on line $LINENO: command \"$BASH_COMMAND\" exited with status 
 # trap signals
 trap 'cleanup' INT TERM ERR
 
+function init {
+    # create the target dir
+    mkdir -p "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript"
+    # copy the custom pattern into fabric
+    cp ./vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
+}
+
 function check_args {
-    echo
+    :
+}
+
+function fetch_transcript {
+    transcript="$(fabric -y "$1")"
+}
+
+function rate_video {
+    echo "$transcript" | fabric -sp vidsift_score_youtube_transcript
 }
 
 function main {
-
+    init
+    fetch_transcript "$1"
+    rate_video
 }
 
 # call main with all args, as given
