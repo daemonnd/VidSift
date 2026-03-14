@@ -25,9 +25,7 @@ function check_args {
 
 function main {
     while read -r url; do
-        if grep -q "$url" <./already_processed_urls.txt; then
-            echo "$url" >>./already_processed_urls.txt
-        else
+        if ! grep -q "$url" <./already_processed_urls.txt; then
             echo "$url"
         fi
     done </dev/stdin
