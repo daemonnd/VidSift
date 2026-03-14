@@ -28,7 +28,7 @@ function check_args {
 function main {
     while read -r url; do
         echo "$url"
-    done < <(./url_collector.sh | ./video_validator.sh)
+    done < <(./url_collector.sh | ./url_validator.sh)
 }
 
 # call main with all args, as given
