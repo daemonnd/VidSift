@@ -59,7 +59,8 @@ function main {
             echo "Downloading ${url}..."
             ./downloader.sh "$url" "$download_path"
         elif [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
-            echo "The video with the url $url would have been summarized, because its score is $score"
+            echo "Summarizing transcript of ${url}..."
+            ./summarizer.sh "$summary_path"
         else
             echo "Then video with the url $url would neither have been summarized nor been downloaded, because its score is $score"
         fi
