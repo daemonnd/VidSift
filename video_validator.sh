@@ -39,6 +39,10 @@ function rate_video {
     if [[ "$score" -lt 0 || "$score" -gt 100 ]]; then
         score=-1
     fi
+    # write the transcript to a file if it should be summarized
+    if [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
+        echo "$transcript" >/tmp/vidsift_transcript.txt
+    fi
     echo "$score"
 
 }
