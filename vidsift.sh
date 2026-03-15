@@ -36,7 +36,7 @@ function main {
     init
     while read -r url; do
         echo "url: $url"
-        score=$(./video_validator.sh "$url")
+        score=$(./video_validator.sh "$url" </dev/null)
         if [[ "$score" -eq -1 ]]; then
             echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the score from the ai was not between 0 and 100."
             echo "Therefore, nothing will be done with this video."

@@ -28,7 +28,9 @@ function check_args {
 }
 
 function fetch_transcript {
-    transcript="$(fabric -y "$1")"
+    if ! transcript="$(fabric -y "$1")"; then
+        return 1
+    fi
 }
 
 function rate_video {
@@ -42,7 +44,10 @@ function rate_video {
 }
 
 function main {
-    fetch_transcript "$1"
+    if ! fetch_transcript "$1"; then
+        echo -1
+        return 0
+    fi
     rate_video
 }
 
