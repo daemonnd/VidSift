@@ -27,7 +27,16 @@ function check_args {
 
 function main {
     while read -r url; do
-        echo "$url"
+        echo "url: $url"
+        score=$(./video_validator.sh "$url")
+        if [[ "$score" -gt 80 ]]; then
+            echo "The video with the url $url would have been downloaded, because its score is $score"
+        elif [[ "$score" -lt 80 && "$score" -gt 40 ]]; then
+            echo "The video with the url $url would have been summarized, because its score is $score"
+        else
+            echo "Then video with the url $url would neither have been summarized nor been downloaded, because its score is $score"
+        fi
+        break
     done < <(./url_collector.sh | ./url_validator.sh)
 }
 
