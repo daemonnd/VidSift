@@ -56,7 +56,8 @@ function main {
             echo "Therefore, nothing will be done with this video."
             continue
         elif [[ "$score" -gt 80 ]]; then
-            echo "The video with the url $url would have been downloaded, because its score is $score"
+            echo "Downloading ${url}..."
+            ./downloader.sh "$url" "$download_path"
         elif [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
             echo "The video with the url $url would have been summarized, because its score is $score"
         else
