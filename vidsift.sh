@@ -37,7 +37,7 @@ function main {
     while read -r url; do
         echo "url: $url"
         score=$(./video_validator.sh "$url")
-        if [[ "$score" -gt 80 ]]; then
+        if [[ "$score" -gt 80 || "$score" -eq 80 ]]; then
             echo "The video with the url $url would have been downloaded, because its score is $score"
         elif [[ "$score" -lt 80 && "$score" -gt 40 ]]; then
             echo "The video with the url $url would have been summarized, because its score is $score"
