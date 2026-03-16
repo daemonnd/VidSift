@@ -25,7 +25,7 @@ function check_args {
 
 function main {
     # cd to target dir
-    cd "/home/$USER/Videos/ytd"
+    cd "$2"
     yt-dlp \
         -f "bestvideo+bestaudio/best" \
         --merge-output-format mkv \

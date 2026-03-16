@@ -28,7 +28,7 @@ function check_args {
 }
 
 function fetch_transcript {
-    if ! transcript="$(fabric -y "$1")"; then
+    if ! transcript="$(fabric -y "$1" --yt-dlp-args="--cookies-from-browser firefox")"; then
         return 1
     fi
 }
@@ -39,6 +39,11 @@ function rate_video {
     if [[ "$score" -lt 0 || "$score" -gt 100 ]]; then
         score=-1
     fi
+    # write the transcript to a file if it should be summarized
+    if [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
+        echo "$transcript" >/tmp/vidsift_transcript.txt
+        echo "${1##*=}" >/tmp/vidsift_url.txt
+    fi
     echo "$score"
 
 }
@@ -48,7 +53,7 @@ function main {
         echo -1
         return 0
     fi
-    rate_video
+    rate_video "$@"
 }
 
 # call main with all args, as given
