@@ -32,6 +32,10 @@ The goal of this project is to solve this problem. To see how exactly, check out
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
 
+## Issues & How to fix them
+
+- YouTube rate limit exeded: Add the url to already_processed_urls.txt
+
 ## Dependencies
 
 - [fabric](https://github.com/danielmiessler/Fabric) for fetching the transcript and using the ai
@@ -40,6 +44,7 @@ The goal of this project is to solve this problem. To see how exactly, check out
 ## Future improvements
 
 - make custom system prompt for fabric depending on the channel
+- also extract the title of the yt video for summary naming convention
 - make it witdaemon service
 - job queue
 - retry system
