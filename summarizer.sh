@@ -25,7 +25,8 @@ function check_args {
 
 function main {
     transcript="$(cat /tmp/vidsift_transcript.txt)"
-    echo "$transcript" | fabric -sp youtube_summary -o "$1"
+    url="$(cat /tmp/vidsift_url.txt)"
+    echo "$transcript" | fabric -sp youtube_summary -o "$1""$url"
 }
 
 # call main with all args, as given
