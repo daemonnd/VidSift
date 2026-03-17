@@ -24,9 +24,13 @@ function check_args {
 }
 
 function main {
+    touch /tmp/vidsift_title.txt
+    touch /tmp/vidsift_transcript.txt
     transcript="$(cat /tmp/vidsift_transcript.txt)"
-    url="$(cat /tmp/vidsift_url.txt)"
-    echo "$transcript" | fabric -sp youtube_summary -o "$1""$url"
+    title="$(cat /tmp/vidsift_title.txt)"
+    dest_path="${1}${title}.md"
+    echo "$transcript" | fabric -sp youtube_summary -o "$dest_path"
+    /usr/local/bin/rename_one_file.sh 2 "$dest_path"
 }
 
 # call main with all args, as given

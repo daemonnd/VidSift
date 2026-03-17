@@ -42,7 +42,7 @@ function rate_video {
     # write the transcript to a file if it should be summarized
     if [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
         echo "$transcript" >/tmp/vidsift_transcript.txt
-        echo "${1##*=}" >/tmp/vidsift_url.txt
+        yt-dlp --skip-download -O '%(title)s' "$1" >/tmp/vidsift_title.txt
     fi
     echo "$score"
 
