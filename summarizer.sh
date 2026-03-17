@@ -25,8 +25,13 @@ function check_args {
 
 function main {
     transcript="$(cat /tmp/vidsift_transcript.txt)"
-    url="$(cat /tmp/vidsift_url.txt)"
-    echo "$transcript" | fabric -sp youtube_summary -o "$1""$url"
+    title="$(cat /tmp/vidsift_title.txt)"
+    dest_path="${1}/${title}.md"
+    echo "$transcript" | fabric -sp youtube_summary -o "$dest_path"
+    # if the user has the file renamer, rename it
+    if [[ -x /usr/local/bin/rename_one_file.sh ]]; then
+        /usr/local/bin/rename_one_file.sh 2 "$dest_path"
+    fi
 }
 
 # call main with all args, as given
