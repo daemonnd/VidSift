@@ -35,6 +35,21 @@ The goal of this project is to solve this problem. To see how exactly, check out
 ## Issues & How to fix them
 
 - YouTube rate limit exeded: Add the url to already_processed_urls.txt
+- Parser error in url_collector.sh: Update the channel id in channelids.json, check out the url manually.
+Exact Error message when that last happened:
+
+```
+-:2: parser error : AttValue: " or ' expected
+<html lang=en>
+           ^
+-:2: parser error : attributes construct error
+<html lang=en>
+           ^
+-:2: parser error : Couldn't find end of Start Tag html line 2
+<html lang=en>
+           ^
+Script url_collector.sh interupted or failed. Cleaning up...
+```
 
 ## Dependencies
 
