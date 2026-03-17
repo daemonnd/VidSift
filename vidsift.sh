@@ -42,7 +42,7 @@ function init {
     # currently hardcoded dest paths
     download_path="/home/$USER/Videos/ytd/"
     validate_target_dir "$download_path" "Video download"
-    summary_path="/home/$USER/Documents/markdown/ai_answers_fabric/"
+    summary_path="/home/$USER/Documents/markdown/vidsift_testing"
     validate_target_dir "$summary_path" "Ai summary"
 }
 
