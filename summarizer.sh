@@ -26,7 +26,7 @@ function check_args {
 function main {
     transcript="$(cat /tmp/vidsift_transcript.txt)"
     title="$(cat /tmp/vidsift_title.txt)"
-    dest_path="${1}${title}.md"
+    dest_path="${1}/${title}.md"
     echo "$transcript" | fabric -sp youtube_summary -o "$dest_path"
     /usr/local/bin/rename_one_file.sh 2 "$dest_path"
 }
