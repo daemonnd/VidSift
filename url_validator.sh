@@ -24,9 +24,9 @@ function check_args {
 }
 
 function main {
-    while read -r url; do
+    while read -r url name; do
         if ! grep -q "$url" <./already_processed_urls.txt; then
-            echo "$url"
+            echo "$url $name"
         fi
     done
 }
