@@ -39,7 +39,7 @@ function main {
                 continue
             fi
             if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then
-                echo "$url $date"
+                echo "$url"
             fi
         done < <(
             # get the xml rss feed
