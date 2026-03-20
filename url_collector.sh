@@ -34,9 +34,29 @@ function main {
 
     while read -r name channelid; do
         # extract all the urls from the xml
-        while read -r url; do
-            echo "$url"
-        done < <(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid" | xmllint --xpath "//*[local-name() = 'link']/@href" - | awk -F '"' ' {print $2} ' | grep -oE 'http.*watch.*')
+        while read -r date url; do
+            if ! date="$(echo $date | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')"; then
+                continue
+            fi
+            if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then
+                echo "$url $date"
+            fi
+        done < <(
+            # get the xml rss feed
+            xml=$(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid")
+            echo "$xml" | awk -F '"' ' $0 ~ /link/ || $0 ~/published/ {
+                    if ( $0 ~ /watch/ ) {
+                        link=$4
+                    }
+                    if ( $0 ~ /published/ ) {
+                            if ( link ~ /watch/ ) {
+                                print $0,  link
+                                link=""
+                            }
+                        }
+                }'
+        )
+
     done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
 }
 
