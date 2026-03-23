@@ -23,6 +23,11 @@ function check_args {
     echo
 }
 
+function clone_repo {
+    # cloning the repo to a dir named vidsift in the current directory, and cd into it
+    git clone "https://github.com/daemonnd/VidSift.git" vidsift && cd vidsift
+}
+
 function init {
     # set directories
     # config dir
