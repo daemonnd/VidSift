@@ -26,11 +26,11 @@ function check_args {
 function main {
     # set directories
     # config dir
-    VIDSIFT_CONFIG_DIR="${XDG_CONFIG_HOME:-"$HOME/.config/vidsift"}"
+    VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME:-"$HOME/.config/vidsift"}}"
     # data dir
-    VIDSIFT_DATA_DIR="${XDG_DATA_HOME:-"$HOME/.local/share/vidsift"}"
+    VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-"$HOME/.local/share/vidsift"}}"
     # vidsift bin dir
-    VIDSIFT_BIN_DIR="${XDG_BIN_HOME:-"$HOME/.local/bin"}"
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin"}}"
     # helper scripts dir
     VIDSIFT_HELPER_SCRIPTS_DIR="${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}"
 
