@@ -44,7 +44,7 @@ function get_custom_instuctions {
 
 function create_final_system_prompt {
     # function for merging the system prompt with the custom channel-specific instructions for the ai
-    base_system_prompt="$(cat ./vidsift_score_youtube_transcript.md)"
+    base_system_prompt="$(cat "$VIDSIFT_CONFIG_DIR"/vidsift_score_youtube_transcript.md)"
     final_system_prompt="${base_system_prompt//'$CUSTOM_CHANNEL_INSTRUCTIONS'/$custom_channel_instructions}"
 
     # replace the current system prompt for the ai by the new one
