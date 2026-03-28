@@ -40,16 +40,12 @@ function init {
     # set directories
     # config dir
     export VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
-    echo "config dir: $VIDSIFT_CONFIG_DIR"
     # data dir
     export VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share/vidsift/}}"
-    echo "data dir: $VIDSIFT_DATA_DIR"
     # vidsift bin dir
     export VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
-    echo "bin dir: $VIDSIFT_BIN_DIR"
     # helper scripts dir
     export VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
-    echo "helper scripts dir: $VIDSIFT_HELPER_SCRIPTS_DIR"
 
     # set up fabric system prompt for validation later
     # create the target dir
