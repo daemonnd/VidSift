@@ -53,6 +53,12 @@ function create_final_system_prompt {
 
 function rate_video {
     score=$(echo "$transcript" | fabric -sp vidsift_score_youtube_transcript)
+    # Check if score is a number
+    if [[ "$score" =~ ^[0-9]+$ ]]; then
+        score="$score"
+    else
+        score=-2
+    fi
     # Check if the score is between 0 and 100 (0 & 100 are included)
     if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
         score=-1
