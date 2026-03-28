@@ -126,8 +126,23 @@ function set_permissions {
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer"
 }
 
+function check_installation_path {
+    # check if vidsift bin dir in in $PATH, and if not, add it to ~/.bashrc and print a warning
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
+    if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
+        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+        echo "vidsift bin directioty $VIDSIFT_BIN_DIR is already in your PATH."
+    else
+        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+        echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
+        echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file."
+        echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+    fi
+}
+
 function main {
     init "$@"
+    check_installation_path "$@"
     check_args "$@"
     if [[ "$fresh_install" == "true" ]]; then
         echo "Performing a fresh install..."
