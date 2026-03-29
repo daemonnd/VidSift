@@ -1,0 +1,65 @@
+{
+    // Config file of vidsift
+    // This file gets loaded by vidsift.sh, and then all the comments get removed before it gets parsed
+    // Using env shell variables work, because the whole config gets piped into envsubst
+    //
+    // ###################################
+    // ---------Destination Paths---------
+    // ###################################
+    // In which directories the downloaded videos and generated summaries will be saved
+    "dest_paths": {
+        "videos": "$HOME/Videos/vidsift/",
+        "summaries": "$HOME/Documents/vidsift/"
+    },
+    //
+    // ###################################
+    // ------Video download options-------
+    // ###################################
+    // how videos will get downloaded, the additional args for yt-dlp
+    "video_download": {
+        "yt-dlp_args": [
+            // one word needs one field, so if you have multiple args, you need to split them into multiple fields
+            "-f",
+            "bestvideos+bestaudio/best", // best quality possible
+            "--merge-output-format",
+            "mkv", // output format: mkv
+            "--retries",
+            "10",
+            "--cookies-from-browser",
+            "firefox" // use cookies from a browser to avoid YouTube Errors 
+            //like sign in to prove that you aren't a bot
+        ]
+    },
+    //
+    // ####################################
+    // -----------Video filtering----------
+    // ####################################
+    // video filtering options, which videos should be used for later processing
+    "video_filtering": {
+        "updatded_before": "14 days ago" // uses date -d
+    },
+    //
+    // #####################################
+    // ---------Channel Operations----------
+    // #####################################
+    // how vidsift should operate with given channels
+    //
+    // validate each video by fetching the transcript and feeding it into ai, then do nothing, summarize or download (default)
+    "channel_operations": {
+        // all the channelids where the videos should be validated before any operation, only operate after validation
+        "validate": {
+            "<channel name>": "<channelid>",
+            "<channel name 2>": "<channelid 2>"
+        },
+        // all the channelids where each video from that channel that does not get filtered out gets downloaded
+        "download": {
+            "<channel name>": "<channelid>",
+            "<channel name 2>": "<channelid 2>"
+        },
+        // all the channelids where each video from that channel that does not get filtered out gets summarized by ai
+        "summary": {
+            "<channel name>": "<channelid>",
+            "<channel name 2>": "<channelid 2>"
+        }
+    }
+}
