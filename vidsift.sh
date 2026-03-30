@@ -15,7 +15,7 @@ function cleanup {
     echo "Script vidsift.sh interupted or failed. Cleaning up..."
 
     # remove tmp files
-
+    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
     # exit the script, preserving the exit code
     exit "$exit_code"
 }
@@ -46,6 +46,9 @@ function init {
     export VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
     # helper scripts dir
     export VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+
+    # parse the config file, write the parsed version to a file in the data dir
+    cat "${VIDSIFT_CONFIG_DIR%/}"/config.jsonc | "${VIDSIFT_HELPER_SCRIPTS_DIR%/}"/parse_config >"${VIDSIFT_DATA_DIR%/}"/parsed_config.json
 
     # set up fabric system prompt for validation later
     # create the target dir
@@ -87,6 +90,9 @@ function main {
             echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
         fi
     done < <("$VIDSIFT_HELPER_SCRIPTS_DIR"/url_collector | "$VIDSIFT_HELPER_SCRIPTS_DIR"/url_validator)
+
+    # cleanup tmp files
+    cleanup
 }
 
 # call main with all args, as given
