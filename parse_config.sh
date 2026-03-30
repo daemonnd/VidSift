@@ -1,4 +1,5 @@
 #!/bin/bash
+# File for removing comments from the config file, so that it can be parsed by jq
 
 # strict mode
 set -Eeuo pipefail
