@@ -9,13 +9,19 @@
 # strict mode
 set -Eeuo pipefail
 
+function rm_tmp_files {
+    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
+    rm "/tmp/vidsift_transcript.txt" 2>/dev/null || true
+    rm "/tmp/vidsift_title.txt" 2>/dev/null || true
+}
+
 # Cleanup function
 function cleanup {
     local exit_code="$?"
     echo "Script vidsift.sh interupted or failed. Cleaning up..."
 
     # remove tmp files
-    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
+    rm_tmp_files
     # exit the script, preserving the exit code
     exit "$exit_code"
 }
@@ -80,6 +86,8 @@ function main {
         # check wether the video should be validated, downloaded or summarized, depending on the given action
         # validate: let ai validate the transcript and decide wether to download, summarize or do nothing with the video, depending on the score
         if [[ "$action" == "validate" ]]; then
+            # fetch the necessary video data for validation and maybe summarization
+            "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"
             # get the score from the ai
             score=$("$VIDSIFT_HELPER_SCRIPTS_DIR"/video_validator "$url" "$name" </dev/null)
             # if there was an error during the validation, the video gets skipped
@@ -114,6 +122,8 @@ function main {
             echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
         # summarize: summarize the video transcript without validating it with ai
         elif [[ "$action" == "summary" ]]; then
+            # fetch the necessary video data for summarization (transcript and title)
+            "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"
             summarize_video "$url"
             # add the url to already_processed_urls.txt
             echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
@@ -127,7 +137,7 @@ function main {
 
     # cleanup tmp files
     echo "All videos processed. Cleaning up..."
-    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
+    rm_tmp_files
 }
 
 # call main with all args, as given
