@@ -62,10 +62,10 @@ function init {
     # copy the custom pattern into fabric
     cp "$VIDSIFT_CONFIG_DIR"/vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
 
-    # currently hardcoded dest paths
-    download_path="/home/$USER/Videos/vidsift/"
+    # set the destination paths for download and summary, and validate them
+    download_path="$(jq -r '.dest_paths.videos' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     validate_target_dir "$download_path" "Video download"
-    summary_path="/home/$USER/Documents/vidsift"
+    summary_path="$(jq -r '.dest_paths.summaries' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     validate_target_dir "$summary_path" "Ai summary"
 }
 
