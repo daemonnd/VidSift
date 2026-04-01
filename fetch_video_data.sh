@@ -25,9 +25,14 @@ function check_args {
     : "${1:?ERROR: The first arg that should contain the video url has not been set}"
 }
 
+function init {
+    # load the yt-dlp args for using yt-dlp and for example the cookies from the user-specified browser
+    mapfile -t yt_dlp_args < <(cat "$VIDSIFT_DATA_DIR"/parsed_config.json | jq -r '.general_processing."yt-dlp_args"[]')
+}
+
 # function to fetch the transcript of the video with fabric
 function fetch_transcript {
-    if ! transcript="$(fabric -y "$1" --yt-dlp-args="--cookies-from-browser firefox")"; then
+    if ! transcript="$(fabric -y "$1" --yt-dlp-args="${yt_dlp_args[*]}")"; then
         return 1
     else
         echo "$transcript" >/tmp/vidsift_transcript.txt
@@ -36,10 +41,12 @@ function fetch_transcript {
 
 # function to fetxh the title of the video for later use as name for the summary file
 function fetch_title {
-    yt-dlp --skip-download --cookies-from-browser firefox -O '%(title)s' "$1" >/tmp/vidsift_title.txt
+
+    yt-dlp --skip-download "${yt_dlp_args[@]}" -O '%(title)s' "$1" >/tmp/vidsift_title.txt
 }
 
 function main {
+    init "$@"
     fetch_transcript "$@"
     fetch_title "$@"
 }
