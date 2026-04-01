@@ -18,16 +18,14 @@
     // how videos will get downloaded, the additional args for yt-dlp
     "video_download": {
         "yt-dlp_args": [
+            // --exec is already used to auto-rename the video if file-renamer is installed
             // one word needs one field, so if you have multiple args, you need to split them into multiple fields
             "-f",
-            "bestvideos+bestaudio/best", // best quality possible
+            "bestvideo+bestaudio/best", // best quality possible
             "--merge-output-format",
             "mkv", // output format: mkv
             "--retries",
-            "10",
-            "--cookies-from-browser",
-            "firefox" // use cookies from a browser to avoid YouTube Errors 
-            //like sign in to prove that you aren't a bot
+            "10"
         ]
     },
     //
@@ -37,6 +35,17 @@
     // video filtering options, which videos should be used for later processing
     "video_filtering": {
         "updatded_before": "14 days ago" // uses date -d
+    },
+    // #####################################
+    // ----------General processing---------
+    // #####################################
+    // general processing options yt-dlp options used for every yt-dlp call, even downloading
+    "general_processing": {
+        "yt-dlp_args": [
+            // one word needs one field, so if you have multiple args, you need to split them into multiple fields
+            "--cookies-from-browser",
+            "firefox" // use cookies from a browser to avoid YouTube Errors like sign in to prove that you aren't a bot
+        ]
     },
     //
     // #####################################
