@@ -39,7 +39,7 @@ function fetch_transcript {
     fi
 }
 
-# function to fetxh the title of the video for later use as name for the summary file
+# function to fetch the title of the video for later use as name for the summary file
 function fetch_title {
 
     yt-dlp --skip-download "${yt_dlp_args[@]}" -O '%(title)s' "$1" >/tmp/vidsift_title.txt
