@@ -24,8 +24,8 @@ function check_args {
     # check for arguments for a fresh install
     for arg in "$@"; do
         case "$arg" in
-        "fresh")
-            fresh_install="true"
+        "local")
+            fresh_install="false"
             ;;
         esac
     done
@@ -59,7 +59,7 @@ function init {
     fi
 
     # set default values for flags
-    fresh_install="false"
+    fresh_install="true"
 }
 
 function create_directories {
