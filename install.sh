@@ -192,9 +192,11 @@ function check_installation_path {
         echo "vidsift bin directory $VIDSIFT_BIN_DIR is already in your PATH."
     else
         mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
-        echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file."
-        echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+        if [[ "$HOME" != *"root"* ]]; then
+            echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
+            echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+        fi
+        echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file if you are not root."
     fi
 }
 
