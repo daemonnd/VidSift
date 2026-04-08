@@ -26,6 +26,9 @@ function check_args {
         case "$arg" in
         "local")
             fresh_install="false"
+            ;;&
+        "daemon-setup")
+            daemon_setup="true"
             ;;
         esac
     done
@@ -60,6 +63,7 @@ function init {
 
     # set default values for flags
     fresh_install="true"
+    daemon_setup="false"
 }
 
 function create_directories {
@@ -75,7 +79,7 @@ function create_directories {
 }
 
 function set_up_daemon {
-    cat <<EOF
+    cat <<EOF >/etc/systemd/system/vidsift-manager.service || echo "ERROR: PermissionError: Please run this script as root to set up the background service."
 [Unit]
 Description=Service for running vidsift in the background
 After=network-online.target
@@ -90,6 +94,7 @@ User=$USER
 WantedBy=multi-user.target
 EOF
 }
+
 function cp_files {
     # copying the files to their target locations
     # config
@@ -181,6 +186,10 @@ function main {
     if [[ "$fresh_install" == "true" ]]; then
         echo "Performing a fresh install..."
         clone_repo "$@"
+    fi
+    if [[ "$daemon_setup" == "true" ]]; then
+        echo "Setting up the service..."
+        set_up_daemon "$@"
     fi
     create_directories "$@"
     cp_files "$@"
