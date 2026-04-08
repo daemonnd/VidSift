@@ -79,20 +79,38 @@ function create_directories {
 }
 
 function set_up_daemon {
-    cat <<EOF >/etc/systemd/system/vidsift-manager.service || echo "ERROR: PermissionError: Please run this script as root to set up the background service."
+    if [ -n "$SUDO_USER" ]; then
+        SUDO_HOME=$(getent passwd "$SUDO_USER" | awk -F ':' '{ print $6 }')
+    else
+        SUDO_HOME="$HOME"
+    fi
+
+    if ! cat <<EOF >/etc/systemd/system/vidsift-manager.service; then
 [Unit]
 Description=Service for running vidsift in the background
 After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=$VIDSIFT_BIN_DIR/vidsift
+ExecStart=$SUDO_HOME/.local/bin/vidsift
 ExecStartPost=/usr/bin/sleep 900
-User=$USER
+User=$SUDO_USER
 
 [Install]
 WantedBy=multi-user.target
 EOF
+        echo "ERROR: PermissionError: Please run this script as root to set up the background service."
+        exit 1
+    fi
+
+    echo "This script assumes that the vidsift bin dir of the sudo user is $SUDO_HOME/.local/bin/. If it is wrong, edit the service file."
+
+    systemctl daemon-reload
+    systemctl enable vidsift-manager.service
+
+    echo "The background daemon has been set up successfully"
+    echo "Vidsift has not been installed. Please re-run this install script without root priviledges to install or update vidsift."
+    exit 0
 }
 
 function cp_files {
