@@ -92,6 +92,8 @@ function set_up_daemon {
     else
         SUDO_HOME="$HOME"
     fi
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-"$SUDO_HOME/.local/bin/"}"
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
 
     if ! cat <<EOF >/etc/systemd/system/vidsift-manager.service; then
 [Unit]
@@ -100,7 +102,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=$SUDO_HOME/.local/bin/vidsift
+ExecStart=$VIDSIFT_BIN_DIR/vidsift
 User=$SUDO_USER
 
 [Install]
