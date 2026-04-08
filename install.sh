@@ -74,6 +74,22 @@ function create_directories {
     mkdir -p "$VIDSIFT_HELPER_SCRIPTS_DIR"
 }
 
+function set_up_daemon {
+    cat <<EOF
+[Unit]
+Description=Service for running vidsift in the background
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=$VIDSIFT_BIN_DIR/vidsift
+ExecStartPost=/usr/bin/sleep 900
+User=$USER
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
 function cp_files {
     # copying the files to their target locations
     # config
