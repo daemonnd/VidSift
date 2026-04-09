@@ -74,8 +74,8 @@ function read_channelids {
 
 function main {
     init
-    read_channelids "validate"
     read_channelids "download"
+    read_channelids "validate"
     read_channelids "summary"
 
 }
