@@ -26,6 +26,9 @@ function check_args {
         case "$arg" in
         "local")
             fresh_install="false"
+            ;;&
+        "daemon-setup")
+            daemon_setup="true"
             ;;
         esac
     done
@@ -37,13 +40,23 @@ function clone_repo {
 }
 
 function init {
+    # checking if the root user or a regular user is running the script
+    if [[ "$EUID" -ne 0 ]]; then
+        install_vidsift="true"
+    else
+        install_vidsift="false"
+    fi
+
     # set directories
     # config dir
     VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
     # data dir
     VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share/vidsift/}}"
     # vidsift bin dir
-    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    # to prevent making this /root/.local/bin when ran as root
+    if [[ "$install_vidsift" == "true" ]]; then
+        VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    fi
     # helper scripts dir
     VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
 
@@ -60,6 +73,7 @@ function init {
 
     # set default values for flags
     fresh_install="true"
+    daemon_setup="false"
 }
 
 function create_directories {
@@ -72,6 +86,52 @@ function create_directories {
     mkdir -p "$VIDSIFT_BIN_DIR"
     # helper scripts dir
     mkdir -p "$VIDSIFT_HELPER_SCRIPTS_DIR"
+}
+
+function set_up_daemon {
+    SUDO_USER="${SUDO_USER:-}"
+    if [ -n "$SUDO_USER" ]; then
+        SUDO_HOME=$(getent passwd "$SUDO_USER" | awk -F ':' '{ print $6 }')
+    else
+        SUDO_HOME="$HOME"
+    fi
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-"$SUDO_HOME/.local/bin/"}"
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
+
+    if ! cat <<EOF >/etc/systemd/system/vidsift-manager.service; then
+[Unit]
+Description=Service for running vidsift in the background
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=$VIDSIFT_BIN_DIR/vidsift
+User=$SUDO_USER
+
+[Install]
+WantedBy=multi-user.target
+EOF
+        echo "ERROR: PermissionError: Please run this script as root to set up the background service."
+        exit 1
+    fi
+
+    echo "This script assumes that the vidsift bin dir of the sudo user is ${VIDSIFT_BIN_DIR}. If it is wrong, edit the service file."
+    cat <<EOF >/etc/systemd/system/vidsift-manager.timer
+[Unit]
+Description=Timer for when restarting vidsift in the background after it exits
+[Timer]
+OnUnitActiveSec=900
+OnBootSec=120
+Unit=vidsift-manager.service
+[Install]
+WantedBy=timers.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable vidsift-manager.timer
+
+    echo "The background daemon has been set up successfully"
+    echo "Vidsift has not been installed. Please re-run this install script without root priviledges to install or update vidsift."
 }
 
 function cp_files {
@@ -146,15 +206,26 @@ function set_permissions {
 
 function check_installation_path {
     # check if vidsift bin dir in in $PATH, and if not, add it to ~/.bashrc and print a warning
-    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
-    if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
-        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        echo "vidsift bin directioty $VIDSIFT_BIN_DIR is already in your PATH."
-    else
-        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
-        echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file."
-        echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+    if [[ "$install_vidsift" == "true" ]]; then
+        VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
+        if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
+            mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+            echo "vidsift bin directory $VIDSIFT_BIN_DIR is already in your PATH."
+        else
+            mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+            if [[ "$HOME" != *"root"* ]]; then
+                echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
+                echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+            fi
+            echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file if you are not root."
+        fi
+    fi
+}
+
+function before_install {
+    if [[ "$install_vidsift" != "true" ]]; then
+        echo "ERROR: The root/superuser cannot install vidsift, it is a user program. Please run this script when installing without superuser/root priviledges."
+        exit 1
     fi
 }
 
@@ -162,10 +233,25 @@ function main {
     init "$@"
     check_installation_path "$@"
     check_args "$@"
+    # if the user only want to set up the background service
+    if [[ "$daemon_setup" == "true" ]]; then
+        echo "Any args concerning the installation of vidsift just like the installation of vidsift itself will be skipped, because this script is running as root."
+        if [[ "$install_vidsift" == "false" ]]; then
+            echo "Setting up the service..."
+            set_up_daemon "$@"
+            exit 0
+        else
+            echo "ERROR: Only the root/superuser is allowed to set up the background service"
+            exit 0
+        fi
+    fi
+    # if the user want to install vidsift from the github repo or locally
     if [[ "$fresh_install" == "true" ]]; then
+        before_install
         echo "Performing a fresh install..."
         clone_repo "$@"
     fi
+    before_install
     create_directories "$@"
     cp_files "$@"
     set_permissions "$@"
