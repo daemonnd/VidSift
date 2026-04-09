@@ -129,6 +129,7 @@ Script url_collector.sh interupted or failed. Cleaning up...
 ### Optional Dependencies
 
 - [file-renamer](https://github.com/daemonnd/file-renamer) for automatically rename video and summary files for a linux fs
+- [systemd](https://systemd.io/) for the vidsift background service
 
 ## Future improvements
 
