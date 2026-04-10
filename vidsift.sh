@@ -56,6 +56,9 @@ function set_env_vars {
 
 function init {
 
+    # source files
+    source "$VIDSIFT_HELPER_SCRIPTS_DIR"/log
+
     # parse the config file, write the parsed version to a file in the data dir
     cat "${VIDSIFT_CONFIG_DIR%/}"/config.jsonc | "${VIDSIFT_HELPER_SCRIPTS_DIR%/}"/parse_config >"${VIDSIFT_DATA_DIR%/}"/parsed_config.json
 
@@ -92,6 +95,7 @@ function summarize_video {
 
 function main {
     init "$@"
+    parse_flags "$@"
     while read -r url name action; do
         echo "Processing video $url from ${name} with action ${action}..."
         # check wether the video should be validated, downloaded or summarized, depending on the given action
