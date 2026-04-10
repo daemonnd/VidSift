@@ -11,7 +11,7 @@ function rm_tmp_files {
 # Cleanup function
 function cleanup {
     local exit_code="$?"
-    echo "Script <script name> interrupted or failed. Cleaning up..."
+    echo "Script log.sh interrupted or failed. Cleaning up..."
 
     # remove tmp files
     rm_tmp_files
@@ -20,25 +20,21 @@ function cleanup {
 }
 
 # trap errors
-trap 'echo "Error on line $LINENO in <script name>: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
+trap 'echo "Error on line $LINENO in log.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
 # trap signals
 trap 'cleanup' INT TERM ERR
 
-function check_args {
-    :
-}
-
+# calculate the output mode with the -v and -s flags
 function calc_output_mode {
-    # calculate the output mode with the -v and -s flags
     output_mode=$(($output_mode + $1))
 }
 
+# parse the args
+# s = silent (no output except errors) output_mode=-1
+# default (no s nor v): only prints errors and the current dir processed in the given file output_mode=0
+# v = errors and info
+# vv = errors, info and debug
 function parse_flags {
-    # parse the args
-    # s = silent (no output except errors) output_mode=-1
-    # default (no s nor v): only prints errors and the current dir processed in the given file output_mode=0
-    # v = all errors, all filenames from -> to changed output_mode=1
-    # vv = all errors, all filenames from --> to changed, also which filenames did not change output_mode=2
     output_mode=0
     while getopts "sv" flag; do
         case "${flag}" in
@@ -48,31 +44,23 @@ function parse_flags {
         esac
     done
     shift "$((OPTIND - 1))"
-    export args="$@"
+    export ARGS="$@"
+    export OUTPUT_MODE="$output_mode"
 }
 
+# logs the output depending on the output_mode
+# args:
+# 1. loglevel (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+# 2. logmessage
+# 3. min. output_mode
+#
+# output modes for loglevels:
+# ERROR: -1
+# WARNING: 0
+# INFO: 1
+# DEBUG 2
 function log {
-    # logs the output depending on the output_mode
-    # args:
-    # 1. loglevel (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    # 2. logmessage
-    # 3. min. output_mode
-    if [[ "$3" -le "$output_mode" ]]; then
+    if [[ "$3" -le "$OUTPUT_MODE" ]]; then
         echo "${1}: $2"
     fi
 }
-
-function init {
-    :
-}
-
-function main {
-    parse_flags "$@"
-    check_args "$args"
-    init "$args"
-    export OUTPUT_MODE="$output_mode"
-
-}
-
-# call main with all args, as given
-main "$@"
