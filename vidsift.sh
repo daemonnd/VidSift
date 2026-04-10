@@ -42,7 +42,7 @@ function validate_target_dir {
     fi
 }
 
-function init {
+function set_env_vars {
     # set directories
     # config dir
     export VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
@@ -52,6 +52,9 @@ function init {
     export VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
     # helper scripts dir
     export VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+}
+
+function init {
 
     # parse the config file, write the parsed version to a file in the data dir
     cat "${VIDSIFT_CONFIG_DIR%/}"/config.jsonc | "${VIDSIFT_HELPER_SCRIPTS_DIR%/}"/parse_config >"${VIDSIFT_DATA_DIR%/}"/parsed_config.json
@@ -88,7 +91,7 @@ function summarize_video {
 }
 
 function main {
-    init
+    init "$@"
     while read -r url name action; do
         echo "Processing video $url from ${name} with action ${action}..."
         # check wether the video should be validated, downloaded or summarized, depending on the given action
@@ -155,5 +158,12 @@ function main {
     rm_tmp_files
 }
 
-# call main with all args, as given
-main "$@"
+# call main with all args, as given, with locking
+set_env_vars "$@"
+(
+    flock -n 9 || {
+        echo "ERROR: There is already an instance of vidsift running."
+        exit 0
+    }
+    main "$@"
+) 9>"$VIDSIFT_DATA_DIR"/vidsift.lock
