@@ -132,6 +132,10 @@ Script url_collector.sh interupted or failed. Cleaning up...
 - [file-renamer](https://github.com/daemonnd/file-renamer) for automatically rename video and summary files for a linux fs
 - [systemd](https://systemd.io/) for the vidsift background service
 
+## Limitations
+
+- uses the custom fabric pattern `vidsift_score_youtube_transcript` and overwrites it on each video validation
+
 ## Future improvements
 
 - make it with a daemon service
