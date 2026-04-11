@@ -11,18 +11,24 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 ## How it works
 
-1. It reads the rss feed channel ids from the channelid.json file.
+1. It reads the rss feed channel ids from the config.jsonc file.
 2. It reads the rss feed of each channel
 3. for each url:
 
-- It checks if the latest urls have already been processed (if they are on already_processed.json), if it is already on the file, it goes to the next url, else:
-- It fetches the transcript with fabric
-- It feeds the transcript into ai (any supported by fabric) and validates it, it gets a score from 0 to 100
-- depending on the score, here is what happens:
+- It checks if the latest urls have already been processed (if they are on already_processed_urls.txt), if it is already on the file, it goes to the next url, else:
+- It performs an action depending on how defined in `config.jsonc`:
+- validating:
+  - It fetches the transcript with fabric
+  - It feeds the transcript into ai (any supported by fabric) and validates it, it gets a score from 0 to 100
+  - depending on the score, here is what happens:
   - score from 100 to 80: Download the video
   - score from 80 to 40: Summarize the video
   - score from 40 to 0: do nothing
-- It writes the video url to already_processed.json
+- downloading:
+  - it downloads the video directly, without validation
+summarizing:
+  - it Summarizes the video transcript directly, without validation
+- It writes the video url to already_processed_urls.txt
 
 ## Features
 
@@ -40,9 +46,9 @@ The goal of this project is to solve this problem. To see how exactly, check out
 ## Usage
 
 1. Install it (pre-v1, not ready for general use)
-2. Create a dir at ~/Videos/vidsift/ and one at ~/Documents/vidsift/
-3. Create a new file name channelids.json
-    Edit it, make it like this:
+2. Edit vidsifts `config.jsonc`, usually located at `~/.config/vidsift/config.jsonc`
+    Make sure to set destination directories for both summaries and downloads.
+    Edit it like this for the channelids:
 
     ```json
     {
@@ -61,13 +67,16 @@ The goal of this project is to solve this problem. To see how exactly, check out
     }
     ```
 
-4. Edit the custom instructions:
+    Note:
+    It is also recommended to add a `--cookies-from-browser firefox` (or whatever browser you are using) to avoid YouTube related issues at the custom yt-dlp args under `general_processing`.
+
+3. Edit the custom instructions:
 
     - go to ./custom_channel_instructions/
     - create a file for each name and put in what kind of videos you want to see from that channel
     - if you want to do it for typecraft: touch ./custom_channel_instructions/typecraft.md
 
-5. Run vidsift.sh with `./vidsift.sh`
+4. Run vidsift.sh with `vidsift`
 
 ### Using vidsift with flags for output control
 
@@ -82,7 +91,8 @@ The goal of this project is to solve this problem. To see how exactly, check out
 To set up a background service that runs vidsift every 15 minutes (default, can be changed by editing the systemd timer),
 you need to run install.sh with as root and use the `daemon-setup` argument.
 The systemd service is named `vidsift-manager.service` and the systemd timer is named `vidsift-manager.timer`.
-They live both in `/etc/systemd/system/`
+They live both in `/etc/systemd/system/`.
+Make sure to add the directories paths for the requirements to `config.jsonc` under general_processing.required_paths, they will be added to the limited `$PATH` while the service runs.
 
 ```bash
 # first, cd to the vidsift project dir
@@ -112,7 +122,7 @@ journalctl -u vidsift-manager.service
 ## Issues & How to fix them
 
 - YouTube rate limit exeded: Add the url to already_processed_urls.txt
-- Parser error in url_collector.sh: Update the channel id in channelids.json, check out the url manually.
+- Parser error in url_collector.sh: Update the channel id in config.jsonc, check out the url manually.
 Exact Error message when that last happened:
 
 ```
@@ -147,10 +157,7 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 ## Future improvements
 
-- make it with a daemon service
 - job queue
 - retry system
-- structured logging
 - rate limit handling
 - plugin architecture
-- a background daemon that manages everything
