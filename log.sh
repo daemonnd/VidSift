@@ -3,27 +3,6 @@
 # strict mode
 set -Eeuo pipefail
 
-# rm tmp files function
-function rm_tmp_files {
-    :
-}
-
-# Cleanup function
-function cleanup {
-    local exit_code="$?"
-    echo "Script log.sh interrupted or failed. Cleaning up..."
-
-    # remove tmp files
-    rm_tmp_files
-    # exit the script, preserving the exit code
-    exit "$exit_code"
-}
-
-# trap errors
-trap 'echo "Error on line $LINENO in log.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
-# trap signals
-trap 'cleanup' INT TERM ERR
-
 # calculate the output mode with the -v and -s flags
 function calc_output_mode {
     output_mode=$(($output_mode + $1))
@@ -55,12 +34,38 @@ function parse_flags {
 # 3. min. output_mode
 #
 # output modes for loglevels:
+# CRITICAL: -2
 # ERROR: -1
 # WARNING: 0
 # INFO: 1
 # DEBUG 2
 function log {
-    if [[ "$3" -le "$OUTPUT_MODE" ]]; then
-        echo "${1}: $2"
-    fi
+    case "$1" in
+    "DEBUG")
+        if [[ "$OUTPUT_MODE" -ge 2 ]]; then
+            echo "${1}: $2"
+        fi
+        ;;
+    "INFO")
+        if [[ "$OUTPUT_MODE" -ge 1 ]]; then
+            echo "${1}: $2"
+        fi
+        ;;
+    "WARNING")
+        if [[ "$OUTPUT_MODE" -ge 0 ]]; then
+            echo "${1}: $2"
+        fi
+        ;;
+    "ERROR")
+        if [[ "$OUTPUT_MODE" -ge -1 ]]; then
+            echo "${1}: $2"
+        fi
+        ;;
+    "CRITICAL")
+        if [[ "$OUTPUT_MODE" -ge -2 ]]; then
+            echo "${1}: $2"
+        fi
+        ;;
+    *) echo "Invalid loglevel: $1 Exiting..." && exit 1 ;;
+    esac
 }
