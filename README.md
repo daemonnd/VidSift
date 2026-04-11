@@ -122,7 +122,7 @@ journalctl -u vidsift-manager.service
 ## Issues & How to fix them
 
 - YouTube rate limit exeded: Add the url to already_processed_urls.txt
-- Parser error in url_collector.sh: Update the channel id in channelids.json, check out the url manually.
+- Parser error in url_collector.sh: Update the channel id in config.jsonc, check out the url manually.
 Exact Error message when that last happened:
 
 ```
